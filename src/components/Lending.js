@@ -1,17 +1,14 @@
 import React from "react";
-import { Link, Routes, Route, useLocation } from 'react-router-dom';
-import { Tab,Tabs,Dialog,DialogContent,DialogActions,DialogTitle, Table, TableHead,TableRow,TableCell,TableBody, InputAdornment, OutlinedInput,Box, AppBar,Toolbar,IconButton, Container, Button, Typography, Link as MUILink, Stack } from "@mui/material";
-import PublicIcon from '@mui/icons-material/Public';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Info } from "@mui/icons-material";
+import { Link } from 'react-router-dom';
+import { Stepper, Step, StepLabel, Tab,Tabs,Dialog,DialogContent,DialogTitle, Table, TableHead,TableRow,TableCell,TableBody, InputAdornment, OutlinedInput,Box, Button, Typography, Link as MUILink, Stack } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 import { styled } from '@mui/material/styles';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
-
+import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 8,
   borderRadius: 5,
@@ -23,7 +20,71 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     backgroundColor: "#66FF88",
   },
 }));
+const QontoConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 10,
+    left: 'calc(-50% + 3px)',
+    right: 'calc(50% + 3px)',
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: 'white',
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: 'white',
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    borderColor: "#131929",
+    borderTopWidth: 3,
+    borderRadius: 1,
+  },
+}));
 
+const QontoStepIconRoot = styled('div')(({ theme, ownerState }) => ({
+  color: "white",
+  display: 'flex',
+  height: 22,
+  alignItems: 'center',
+  ...(ownerState.active && {
+    color: 'white',
+  }),
+  zIndex:100,
+  '& .QontoStepIcon-ActiveIcon': {
+    width: 14,
+    height: 14,
+    borderRadius: '50%',
+    backgroundColor: 'currentColor',
+  },
+  '& .QontoStepIcon-circle': {
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    backgroundColor: 'currentColor',
+  },
+}));
+
+function QontoStepIcon(props) {
+  const { active, completed, className } = props;
+
+  return (
+    <QontoStepIconRoot ownerState={{ active }} className={className}>
+      {active ? (
+        <CheckIcon className="QontoStepIcon-ActiveIcon" />
+      ) : (
+        <div className="QontoStepIcon-circle" />
+      )}
+    </QontoStepIconRoot>
+  );
+}
+
+// QontoStepIcon.propTypes = {
+//   active: PropTypes.bool,
+//   className: PropTypes.string,
+//   completed: PropTypes.bool,
+// };
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -35,7 +96,7 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ mt: 3, overflow:"hidden" }}>{children}</Box>}
     </div>
   );
 }
@@ -108,7 +169,7 @@ class Lending extends React.Component {
         // function:sort
       },
       {
-        title:"Totla Borrowed",
+        title:"Total Borrowed",
         color:"#88B8D8",
         direction:"right",
         width:"20%",
@@ -163,6 +224,7 @@ class Lending extends React.Component {
         walletMoney:"0"
       },
     ];
+    this.steps = ["0%","25%","50%","75%","100%",];
     this.state = {
       open:false,
       tab: 0,
@@ -192,7 +254,7 @@ class Lending extends React.Component {
               <Infos title="Total Borrowed:" value="$950K" />
               <Infos title="Lent Out:" value="15.2%" />
             </Stack>
-            <Button onClick={this.handleOpen} sx={{color:"#88B8D8",width:"96px",height:"41px",bgcolor:"#0A0C14",border:"1px solid #88B8D8"}}>Liquidate</Button>
+            <Box component={Link} to='/liquidate' sx={{color:"#88B8D8", textDecoration:"none",width:"96px",height:"41px",bgcolor:"#0A0C14",border:"1px solid #88B8D8", borderRadius:"7px", display:"flex", justifyContent:"center", alignItems:"center"}}>Liquidate</Box>
           </Stack>
           <Box sx={{mt:3, border:"1px solid #141929", borderRadius:"7px"}}>
             <Box sx={{bgcolor:"#0A141F"}}>
@@ -227,7 +289,8 @@ class Lending extends React.Component {
                   {this.data.map((row,index) => (
                     <TableRow
                       key={index}
-                      sx={{ 'td, th': { border: 0 } }}
+                      sx={{ 'td, th': { border: 0 }, cursor:"pointer" }}
+                      onClick={this.handleOpen}
                     >
                       <TableCell component="th" scope="row" sx={{color:"white", px:1}}>
                         <Box display="flex" gap={1}>
@@ -348,18 +411,160 @@ class Lending extends React.Component {
         
         {/* Dialog Section */}
         {/* <Dialog maxWidth="xs" onClose={this.handleClose} open={this.state.open} sx={{border:"1px solid #141929", borderRadius:"7px"}}> */}
-        <Dialog minWidth="sm" maxWidth="600px" onClose={this.handleClose} open={true} >
+        <Dialog minWidth="sm" maxWidth="600px" sx={{"& .MuiPaper-root":{width:"600px", borderRadius:"7px"}}} onClose={this.handleClose} open={this.state.open} >
           <DialogTitle bgcolor="#090C13" sx={{p:3, display:"flex", justifyContent:"space-between"}}>
             <Typography variant="h4" fontWeight="700" color="white">USD Coin (wormhole)</Typography>
-            <CloseIcon sx={{color:"#88B8D8"}}/>
+            <CloseIcon sx={{color:"#88B8D8", cursor:"pointer"}} onClick={this.handleClose}/>
           </DialogTitle>
-          <DialogContent sx={{bgcolor:"#0F131F"}}>
-            <Tabs value={this.state.tab} onChange={this.handleTab}>
+          <DialogContent sx={{bgcolor:"#0F131F",color:"white"}}>
+            <Tabs value={this.state.tab} onChange={this.handleTab} sx={{"& .MuiTabs-indicator":{bgcolor:"white"}}}>
               <Tab label="Deposit" {...a11yProps(0)} sx={{ width: "25%",color: "#88B8D8","&.Mui-selected": {color: "#fff",},}}/>
               <Tab label="Withdraw" {...a11yProps(1)} sx={{ width: "25%",color: "#88B8D8","&.Mui-selected": {color: "#fff",},}}/>
               <Tab label="Borrow" {...a11yProps(2)} sx={{ width: "25%",color: "#88B8D8","&.Mui-selected": {color: "#fff",},}}/>
               <Tab label="Repay" {...a11yProps(3)} sx={{ width: "25%",color: "#88B8D8","&.Mui-selected": {color: "#fff",},}}/>
             </Tabs>
+            <TabPanel value={this.state.tab} index={0}>
+              <Box>
+                <OutlinedInput
+                    value="zUSDC"
+                    readOnly
+                    sx={{textAlign:"center",width:"100%",color:"white",bgcolor:"#141929", "& fieldset":{border:"none"}, "& input":{textAlign:'center'}}}
+                  />
+                <Box sx={{mt:2, display:"flex", justifyContent:"space-between"}}>
+                  <Typography variant="subtitle2" color="#88B8D8">Max: 0 zUSDC</Typography>
+                  <Box display="flex" gap={1}>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>Half</Box>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>max</Box>
+                  </Box>
+                </Box>
+                <Box sx={{mt:2, mx:"-7%", overflowX:"hidden"}}>
+                  <Stepper alternativeLabel activeStep={1} connector={<QontoConnector />}>
+                    {this.steps.map((label) => (
+                      <Step key={label} sx={{px:0}}>
+                        <StepLabel StepIconComponent={QontoStepIcon} sx={{"& .MuiStepLabel-labelContainer .MuiStepLabel-label":{color:"#88B8D8", mt:1}}}>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Available</Typography>
+                  <Typography variant="h6" color="white">11.22 zUSDC</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">APY</Typography>
+                  <Typography variant="h6" color="#66FF88">0.22%</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Wallet</Typography>
+                  <Typography variant="h6" color="white">0 zUSDC</Typography>
+                </Box>
+                <Button sx={{mt:2, width:"100%", bgcolor:"#58809A", color:"black", borderRadius:"10px", textTransform:"none"}} variant="contained">Please input a valid number</Button>
+                <Button sx={{mt:2, width:"100%", color:"#88B8D8"}}>More Info <ExpandMoreIcon /></Button>
+              </Box>
+            </TabPanel>
+            <TabPanel value={this.state.tab} index={1}>
+              <Box>
+                <OutlinedInput
+                    value="zUSDC"
+                    sx={{textAlign:"center",width:"100%",color:"white",bgcolor:"#141929", "& fieldset":{border:"none"}}}
+                  />
+                <Box sx={{mt:2, display:"flex", justifyContent:"space-between"}}>
+                  <Typography variant="subtitle2" color="#88B8D8">Available: 2.12412 zUSDC</Typography>
+                  <Box display="flex" gap={1}>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>Half</Box>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>max</Box>
+                  </Box>
+                </Box>
+                <Box sx={{mt:2, mx:"-7%", overflowX:"hidden"}}>
+                  <Stepper alternativeLabel activeStep={1} connector={<QontoConnector />}>
+                    {this.steps.map((label) => (
+                      <Step key={label} sx={{px:0}}>
+                        <StepLabel StepIconComponent={QontoStepIcon} sx={{"& .MuiStepLabel-labelContainer .MuiStepLabel-label":{color:"#88B8D8", mt:1}}}>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Wallet</Typography>
+                  <Typography variant="h6" color="white">5.423 USDC</Typography>
+                </Box>
+                <Button sx={{mt:2, width:"100%", bgcolor:"#58809A", color:"black", borderRadius:"10px", textTransform:"none"}} variant="contained">Please input a valid number</Button>
+                <Button sx={{mt:2, width:"100%", color:"#88B8D8"}}>More Info <ExpandMoreIcon /></Button>
+              </Box>
+            </TabPanel>
+            <TabPanel value={this.state.tab} index={2}>
+              <Box>
+                <OutlinedInput
+                    value="zUSDC"
+                    readOnly
+                    sx={{textAlign:"center",width:"100%",color:"white",bgcolor:"#141929", "& fieldset":{border:"none"}, "& input":{textAlign:'center'}}}
+                  />
+                <Box sx={{mt:2, display:"flex", justifyContent:"space-between"}}>
+                  <Typography variant="subtitle2" color="#88B8D8">Max: 0 zUSDC</Typography>
+                  <Box display="flex" gap={1}>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>Half</Box>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>max</Box>
+                  </Box>
+                </Box>
+                <Box sx={{mt:2, mx:"-7%", overflowX:"hidden"}}>
+                  <Stepper alternativeLabel activeStep={1} connector={<QontoConnector />}>
+                    {this.steps.map((label) => (
+                      <Step key={label} sx={{px:0}}>
+                        <StepLabel StepIconComponent={QontoStepIcon} sx={{"& .MuiStepLabel-labelContainer .MuiStepLabel-label":{color:"#88B8D8", mt:1}}}>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">APY</Typography>
+                  <Typography variant="h6" color="#FF6959">6.30%</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Borrow Fee</Typography>
+                  <Typography variant="h6" color="#FF6959">-0.00 zUSDC</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Your Margin</Typography>
+                  <Typography variant="h6" color="white">$8.214</Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Wallet</Typography>
+                  <Typography variant="h6" color="white">5.423 USDC</Typography>
+                </Box>
+                <Button sx={{mt:2, width:"100%", bgcolor:"#58809A", color:"black", borderRadius:"10px", textTransform:"none"}} variant="contained">Please input a valid number</Button>
+                <Button sx={{mt:2, width:"100%", color:"#88B8D8"}}>More Info <ExpandMoreIcon /></Button>
+              </Box>
+            </TabPanel>
+            <TabPanel value={this.state.tab} index={3}>
+              <Box>
+                <OutlinedInput
+                    value="zUSDC"
+                    sx={{textAlign:"center",width:"100%",color:"white",bgcolor:"#141929", "& fieldset":{border:"none"}}}
+                  />
+                <Box sx={{mt:2, display:"flex", justifyContent:"space-between"}}>
+                  <Typography variant="subtitle2" color="#88B8D8">Available: 2.12412 zUSDC</Typography>
+                  <Box display="flex" gap={1}>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>Half</Box>
+                    <Box sx={{p:1,borderRadius:"7px",border:"1px solid #88B8D8", fontSize:"14px", color:"#88B8D8"}}>max</Box>
+                  </Box>
+                </Box>
+                <Box sx={{mt:2, mx:"-7%", overflowX:"hidden"}}>
+                  <Stepper alternativeLabel activeStep={1} connector={<QontoConnector />}>
+                    {this.steps.map((label) => (
+                      <Step key={label} sx={{px:0}}>
+                        <StepLabel StepIconComponent={QontoStepIcon} sx={{"& .MuiStepLabel-labelContainer .MuiStepLabel-label":{color:"#88B8D8", mt:1}}}>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+                <Box display="flex" justifyContent="space-between" sx={{mt:2}}>
+                  <Typography variant="h6" color="#88B8D8">Wallet</Typography>
+                  <Typography variant="h6" color="white">5.423 USDC</Typography>
+                </Box>
+                <Button sx={{mt:2, width:"100%", bgcolor:"#58809A", color:"black", borderRadius:"10px", textTransform:"none"}} variant="contained">Please input a valid number</Button>
+                <Button sx={{mt:2, width:"100%", color:"#88B8D8"}}>More Info <ExpandMoreIcon /></Button>
+              </Box>
+            </TabPanel>
           </DialogContent>
         </Dialog>
       </Stack>

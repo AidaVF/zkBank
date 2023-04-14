@@ -11,6 +11,8 @@ import PublicIcon from '@mui/icons-material/Public';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Lending from "./components/Lending";
+import Liquidate from "./components/Liquidate";
+import Swap from "./components/Swap";
 
 class Infos extends React.Component {
   constructor(props){
@@ -54,7 +56,7 @@ class App extends React.Component {
         link:"/dashboard"
       },
       {
-        title:"Trading",
+        title:"NFT Lending",
         link:"/trading"
       },
     ];
@@ -75,8 +77,11 @@ class App extends React.Component {
               }}
             >
               <Box sx={{display:"flex", alignItems:"center"}}>
-                <Box component="p" color="#88B8D8" fontWeight="700" fontSize="22px" sx={{ml:"10px",display:{xs:"none", sm:"block"}}}>
-                  LOGO
+                <Box display="flex" alignItems="center">
+                  <Box component="img" src="logo.png" width={40} height={40} />
+                  <Box component="p" color="white" fontWeight="700" fontSize="22px" sx={{ml:"10px",display:{xs:"none", sm:"block"}}}>
+                    zkBank
+                  </Box>
                 </Box>
                 <Box sx={{ml:3}}>
                   {
@@ -103,6 +108,11 @@ class App extends React.Component {
           <Container maxWidth="1920px">
             <Routes>
               <Route path="/" element={<Lending />}/>
+              <Route path="/liquidate" element={<Liquidate />}/>
+              <Route path="/swap" element={<Swap />}/>
+              <Route path="/bridge" element={<Swap />}/>
+              <Route path="/dashboard" element={<Swap />}/>
+              <Route path="/trading" element={<Swap />}/>
             </Routes>
           </Container>
         </Box>
