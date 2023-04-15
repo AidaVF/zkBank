@@ -245,11 +245,11 @@ class Lending extends React.Component {
     });
   };  render() {
     return (
-      <Stack direction={{sm:"row", xs:"column"}} rowGap={2} columnGap={2} sx={{mt:3}}>
+      <Stack direction={{md:"row", sm:"column"}} rowGap={2} columnGap={2} sx={{mt:3}}>
         {/* Table Section */}
         <Box flex={4}>
-          <Stack direction={{sm:"row", xs:"column"}} justifyContent="space-between">
-            <Stack direction={{sm:"row", xs:"column"}} rowGap={1} columnGap={1}>
+          <Stack flexDirection="row" flexWrap="wrap" justifyContent={"space-between"} rowGap={1} columnGap={1}>
+            <Stack direction="row" flexDirection="wrap" rowGap={1} columnGap={1}>
               <Infos title="Current Market Size:" value="$950K" />
               <Infos title="Total Borrowed:" value="$950K" />
               <Infos title="Lent Out:" value="15.2%" />
@@ -267,65 +267,67 @@ class Lending extends React.Component {
                 placeholder="Search token"
                 startAdornment={<InputAdornment position="start"><SearchIcon sx={{color:"#88B8D8"}} /></InputAdornment>}
               />
-              <Table sx={{ }}>
-                <TableHead>
-                  <TableRow>
-                    {
-                      this.header.map((ele,index)=>{
-                        return (<TableCell key={index} sx={{px:1,border:"none",color:ele.color, width:ele.width}} >
-                          <Box sx={{display:"flex", justifyContent:ele.direction, fontSize:"15px"}}>
-                            {ele.title}
-                            <Box sx={{display:"flex", flexDirection:'column'}}>
-                            <ExpandLessIcon fontSize="12px" sx={{mb:"-2px"}}/>
-                            <ExpandMoreIcon fontSize="12px" sx={{mt:"-2px"}}/>
+              <Box overflow="auto">
+                <Table sx={{minWidth:1000}}>
+                  <TableHead>
+                    <TableRow>
+                      {
+                        this.header.map((ele,index)=>{
+                          return (<TableCell key={index} sx={{px:1,border:"none",color:ele.color, width:ele.width}} >
+                            <Box sx={{display:"flex", justifyContent:ele.direction, fontSize:"15px"}}>
+                              {ele.title}
+                              <Box sx={{display:"flex", flexDirection:'column'}}>
+                              <ExpandLessIcon fontSize="12px" sx={{mb:"-2px"}}/>
+                              <ExpandMoreIcon fontSize="12px" sx={{mt:"-2px"}}/>
+                              </Box>
+                            </Box>
+                            </TableCell>);
+                        })
+                      }
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.data.map((row,index) => (
+                      <TableRow
+                        key={index}
+                        sx={{ 'td, th': { border: 0 }, cursor:"pointer" }}
+                        onClick={this.handleOpen}
+                      >
+                        <TableCell component="th" scope="row" sx={{color:"white", px:1}}>
+                          <Box display="flex" gap={1}>
+                            <Box component="img" src="mark.png" alt={row.assetName} />
+                            <Box display="flex" flexDirection="column">
+                              <Typography variant="h6" color="white">{row.assetName}</Typography>
+                              <Typography variant="subtitle2" color="#88B8D8">${row.price}</Typography>
                             </Box>
                           </Box>
-                          </TableCell>);
-                      })
-                    }
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.data.map((row,index) => (
-                    <TableRow
-                      key={index}
-                      sx={{ 'td, th': { border: 0 }, cursor:"pointer" }}
-                      onClick={this.handleOpen}
-                    >
-                      <TableCell component="th" scope="row" sx={{color:"white", px:1}}>
-                        <Box display="flex" gap={1}>
-                          <Box component="img" src="mark.png" alt={row.assetName} />
+                        </TableCell>
+                        <TableCell align="right"><Typography variant="h6" color="white">{row.ltv}%</Typography></TableCell>
+                        <TableCell align="right"><Typography variant="h6" color="#66FF88">{row.depositApy}%</Typography></TableCell>
+                        <TableCell align="right">
                           <Box display="flex" flexDirection="column">
-                            <Typography variant="h6" color="white">{row.assetName}</Typography>
-                            <Typography variant="subtitle2" color="#88B8D8">${row.price}</Typography>
+                            <Typography variant="h6" color="white">{row.marketSize + " " + row.assetName}</Typography>
+                            <Typography variant="subtitle2" color="#88B8D8">${row.marketSizeMoney}</Typography>
                           </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right"><Typography variant="h6" color="white">{row.ltv}%</Typography></TableCell>
-                      <TableCell align="right"><Typography variant="h6" color="#66FF88">{row.depositApy}%</Typography></TableCell>
-                      <TableCell align="right">
-                        <Box display="flex" flexDirection="column">
-                          <Typography variant="h6" color="white">{row.marketSize + " " + row.assetName}</Typography>
-                          <Typography variant="subtitle2" color="#88B8D8">${row.marketSizeMoney}</Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right"><Typography variant="h6" color="#FF6959">{row.borrowApy}%</Typography></TableCell>
-                      <TableCell align="right">
-                        <Box display="flex" flexDirection="column">
-                          <Typography variant="h6" color="white">{row.totalBorrowed} USDC</Typography>
-                          <Typography variant="subtitle2" color="#88B8D8">${row.totalBorrowedMoney}</Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box display="flex" flexDirection="column">
-                          <Typography variant="h6" color="white">{row.wallet} USDC</Typography>
-                          <Typography variant="subtitle2" color="#88B8D8">${row.walletMoney}</Typography>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        </TableCell>
+                        <TableCell align="right"><Typography variant="h6" color="#FF6959">{row.borrowApy}%</Typography></TableCell>
+                        <TableCell align="right">
+                          <Box display="flex" flexDirection="column">
+                            <Typography variant="h6" color="white">{row.totalBorrowed} USDC</Typography>
+                            <Typography variant="subtitle2" color="#88B8D8">${row.totalBorrowedMoney}</Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box display="flex" flexDirection="column">
+                            <Typography variant="h6" color="white">{row.wallet} USDC</Typography>
+                            <Typography variant="subtitle2" color="#88B8D8">${row.walletMoney}</Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
             </Box>
           </Box>
         </Box>

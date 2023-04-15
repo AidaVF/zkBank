@@ -169,49 +169,51 @@ class Liquidate extends React.Component {
         </Box>
         {/* Table Section */}
         <Box sx={{mt:3, border:"1px solid #141929", borderRadius:"7px"}}>
-          <Table sx={{ }}>
-            <TableHead sx={{bgcolor:"#0A141F"}}>
-              <TableRow>
-                {
-                  this.header.map((ele,index)=>{
-                    return (<TableCell key={index} sx={{px:1,border:"none",color:ele.color, width:ele.width}} >
-                      <Box sx={{display:"flex", justifyContent:ele.direction, fontSize:"15px"}}>
-                        {ele.title}
-                        {ele.sort?
-                        (<Box sx={{display:"flex", flexDirection:'column'}}>
-                        <ExpandLessIcon fontSize="12px" sx={{mb:"-2px"}}/>
-                        <ExpandMoreIcon fontSize="12px" sx={{mt:"-2px"}}/>
-                        </Box>):<Box></Box>
-                        }
-                      </Box>
-                      </TableCell>);
-                  })
-                }
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.data.map((row,index) => (
-                <TableRow
-                  key={index}
-                  sx={{ 'td, th': { border: 0 }, cursor:"pointer" }}
-                  onClick={this.handleOpen}
-                >
-                  <TableCell align="center" component="th" scope="row" sx={{color:"white", px:1}}>
-                    <Typography variant="h6" color="#80ADCB">{row.user.substring(0,5)}....{row.user.substring(row.user.length-5)}</Typography>
-                  </TableCell>
-                  <TableCell align="center"><Typography variant="h6" color="white">{row.profile}</Typography></TableCell>
-                  <TableCell align="center"><Box component="img" src={row.borrowedAsset} /></TableCell>
-                  <TableCell align="right"><Typography variant="h6" color="white">${row.borrowedValue}</Typography></TableCell>
-                  <TableCell align="center"><Box component="img" src={row.depositedAsset} /></TableCell>
-                  <TableCell align="right"><Typography variant="h6" color="white">${row.depositedValue}</Typography></TableCell>
-                  <TableCell align="right"><Typography variant="h6" color="#FF6959">{row.riskFactor}%</Typography></TableCell>
-                  <TableCell align="center">
-                    <Button variant="contained" sx={{bgcolor:"#88B8D8", color:"black", borderRadius:"9px"}}>Liquidate</Button>
-                  </TableCell>
+          <Box overflow="auto">
+            <Table sx={{minWidth:1000}}>
+              <TableHead sx={{bgcolor:"#0A141F"}}>
+                <TableRow>
+                  {
+                    this.header.map((ele,index)=>{
+                      return (<TableCell key={index} sx={{px:1,border:"none",color:ele.color, width:ele.width}} >
+                        <Box sx={{display:"flex", justifyContent:ele.direction, fontSize:"15px"}}>
+                          {ele.title}
+                          {ele.sort?
+                          (<Box sx={{display:"flex", flexDirection:'column'}}>
+                          <ExpandLessIcon fontSize="12px" sx={{mb:"-2px"}}/>
+                          <ExpandMoreIcon fontSize="12px" sx={{mt:"-2px"}}/>
+                          </Box>):<Box></Box>
+                          }
+                        </Box>
+                        </TableCell>);
+                    })
+                  }
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {this.data.map((row,index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ 'td, th': { border: 0 }, cursor:"pointer" }}
+                    onClick={this.handleOpen}
+                  >
+                    <TableCell align="center" component="th" scope="row" sx={{color:"white", px:1}}>
+                      <Typography variant="h6" color="#80ADCB">{row.user.substring(0,5)}....{row.user.substring(row.user.length-5)}</Typography>
+                    </TableCell>
+                    <TableCell align="center"><Typography variant="h6" color="white">{row.profile}</Typography></TableCell>
+                    <TableCell align="center"><Box component="img" src={row.borrowedAsset} /></TableCell>
+                    <TableCell align="right"><Typography variant="h6" color="white">${row.borrowedValue}</Typography></TableCell>
+                    <TableCell align="center"><Box component="img" src={row.depositedAsset} /></TableCell>
+                    <TableCell align="right"><Typography variant="h6" color="white">${row.depositedValue}</Typography></TableCell>
+                    <TableCell align="right"><Typography variant="h6" color="#FF6959">{row.riskFactor}%</Typography></TableCell>
+                    <TableCell align="center">
+                      <Button variant="contained" sx={{bgcolor:"#88B8D8", color:"black", borderRadius:"9px"}}>Liquidate</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
         </Box>
       </Box>
     );
